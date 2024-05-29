@@ -48,36 +48,35 @@ allSquares.forEach(square => {
 function dragStart(e) {
     //div.piece - parent of img, parent of div.piece - square
     draggedElement = e.target.parentNode.parentNode
-    startPosition = draggedElement.getAttribute('square-id') //square
+    startPosition = draggedElement.getAttribute('square-id')
+    // save the HTML of the dragged piece
+    e.dataTransfer.setData('text/html', draggedElement.outerHTML)
 }
 
 function dragOver(e) {
-    // if target = free square, endPosition - square-id of target
-    // if target = a piece, endPosition - square-id of the parent of target
-    endPosition = e.target.getAttribute('square-id') || e.target.parentNode.getAttribute('square-id')
     e.preventDefault()
 }
 
-
 function dropPiece(e) {
-    if (endPosition) {
-        const startPiece = draggedElement.innerHTML;
-        const target = e.target;
-  
-        // remove the piece from the start position
-        draggedElement.innerHTML = "";
-  
-        // if target = an image, drop the piece in the parent of the parent of the target (the square)
-        // if an empty square, drop the piece in the target itself
-        if (target.tagName === "IMG") {
-            target.parentNode.parentNode.innerHTML = startPiece;
-        } else {
-            target.innerHTML = startPiece;
+    e.preventDefault();
+    const targetSquare = e.target.closest('.square');
+    endPosition = targetSquare.getAttribute('square-id');
+    
+    if (startPosition !== endPosition) {
+        targetSquare.innerHTML = e.dataTransfer.getData('text/html');
+        const newPiece = targetSquare.querySelector('.piece img');
+        if (newPiece) {
+            newPiece.setAttribute('draggable', true);
+            newPiece.addEventListener('dragstart', dragStart);
         }
+
+        // clear the original square
+        const originalSquare = document.querySelector(`.square[square-id='${startPosition}']`);
+        originalSquare.innerHTML = '';
+    }
     
         // reset variables
         draggedElement = null;
         startPosition = null;
         endPosition = null;
-    }
-  }
+}
