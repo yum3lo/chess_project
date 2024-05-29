@@ -2,6 +2,9 @@ const gameBoard = document.querySelector("#gameboard")
 const playerDisplay = document.querySelector("#player")
 const infoDisplay = document.querySelector("#info-display")
 const width = 8
+let playerGo = "white"
+playerDisplay.textContent = playerGo
+
 const startPieces = [
     rook_b, knight_b, bishop_b, queen_b, king_b, bishop_b, knight_b, rook_b,
     pawn_b, pawn_b, pawn_b, pawn_b, pawn_b, pawn_b, pawn_b, pawn_b,
@@ -36,7 +39,7 @@ function createBoard() {
 
 createBoard()
 
-const allSquares = document.querySelectorAll("#gameboard .square")
+const allSquares = document.querySelectorAll(".square")
 let startPosition, draggedElement, endPosition
 
 allSquares.forEach(square => {
@@ -78,4 +81,32 @@ function dropPiece(e) {
     draggedElement = null;
     startPosition = null;
     endPosition = null;
+
+    const taken = e.target.classList.contains('piece')
+    chnagePlayer()
+}
+
+function chnagePlayer() {
+    if (playerGo === "white") {
+        // reverse ids of squares, like turning the gameboard upside down
+        reverseIds()
+        playerGo = "black"
+        playerDisplay.textContent = 'black'
+    } else {
+        revertIds()
+        playerGo = "white"
+        playerDisplay.textContent = 'white'
+    }
+}
+
+function reverseIds(){
+    const allSquares = document.querySelectorAll(".square")
+    allSquares.forEach((square, i) => 
+        square.setAttribute('square-id', (width * width -1) - i))
+}
+
+function revertIds(){
+    const allSquares = document.querySelectorAll(".square")
+    allSquares.forEach((square, i) => 
+        square.setAttribute('square-id', i))
 }
