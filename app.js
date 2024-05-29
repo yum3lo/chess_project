@@ -40,15 +40,14 @@ const allSquares = document.querySelectorAll("#gameboard .square")
 let startPosition, draggedElement, endPosition
 
 allSquares.forEach(square => {
-    square.addEventListener('dragstart', dragStart)
-    square.addEventListener('dragover', dragOver)
-    square.addEventListener('drop', dropPiece)
-})
+    square.addEventListener('dragover', dragOver);
+    square.addEventListener('drop', dropPiece);
+});
 
 function dragStart(e) {
     //div.piece - parent of img, parent of div.piece - square
-    draggedElement = e.target.parentNode.parentNode
-    startPosition = draggedElement.getAttribute('square-id')
+    draggedElement = e.target.parentNode
+    startPosition = draggedElement.parentNode.getAttribute('square-id')
     // save the HTML of the dragged piece
     e.dataTransfer.setData('text/html', draggedElement.outerHTML)
 }
@@ -75,8 +74,8 @@ function dropPiece(e) {
         originalSquare.innerHTML = '';
     }
     
-        // reset variables
-        draggedElement = null;
-        startPosition = null;
-        endPosition = null;
+    // reset variables
+    draggedElement = null;
+    startPosition = null;
+    endPosition = null;
 }
