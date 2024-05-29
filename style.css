@@ -15,8 +15,12 @@
     width: 81px;
     height: 81px;
     margin: 5px;
-    position: relative;
-    z-index: -9;
+    cursor: grab;
+    z-index: 1;
+}
+
+.square img:active {
+    cursor: grabbing;
 }
 
 .piece {
@@ -31,10 +35,3 @@
 .pink {
     background-color: #f1c8e2;
 }
-
-/* .piece img {
-    width: 85px;
-    height: 85px;
-    position: relative;
-    z-index: 10;
-} */

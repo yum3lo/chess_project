@@ -1,4 +1,3 @@
-import { dragStart, dragOver, dragDrop } from './dragFunctions.js';
 const gameBoard = document.querySelector("#gameboard")
 const playerDisplay = document.querySelector("#player")
 const infoDisplay = document.querySelector("#info-display")
@@ -38,27 +37,47 @@ function createBoard() {
 createBoard()
 
 const allSquares = document.querySelectorAll("#gameboard .square")
+let startPosition, draggedElement, endPosition
 
 allSquares.forEach(square => {
     square.addEventListener('dragstart', dragStart)
     square.addEventListener('dragover', dragOver)
-    square.addEventListener('drop', dragDrop)
+    square.addEventListener('drop', dropPiece)
 })
 
-let startPosition
-let draggedElement
-
 function dragStart(e) {
-    e.stopPropagation()
-    startPosition = e.target.parentNode.getAttribute('square-id') //square
-    draggedElement = e.target.parentNode //div
+    //div.piece - parent of img, parent of div.piece - square
+    draggedElement = e.target.parentNode.parentNode
+    startPosition = draggedElement.getAttribute('square-id') //square
 }
 
 function dragOver(e) {
+    // if target = free square, endPosition - square-id of target
+    // if target = a piece, endPosition - square-id of the parent of target
+    endPosition = e.target.getAttribute('square-id') || e.target.parentNode.getAttribute('square-id')
     e.preventDefault()
 }
 
-function dragDrop(e) {
-    e.stopPropagation()
-    e.target.append(draggedElement)
-}
+
+function dropPiece(e) {
+    if (endPosition) {
+        const startPiece = draggedElement.innerHTML;
+        const target = e.target;
+  
+        // remove the piece from the start position
+        draggedElement.innerHTML = "";
+  
+        // if target = an image, drop the piece in the parent of the parent of the target (the square)
+        // if an empty square, drop the piece in the target itself
+        if (target.tagName === "IMG") {
+            target.parentNode.parentNode.innerHTML = startPiece;
+        } else {
+            target.innerHTML = startPiece;
+        }
+    
+        // reset variables
+        draggedElement = null;
+        startPosition = null;
+        endPosition = null;
+    }
+  }
