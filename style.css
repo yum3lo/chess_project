@@ -1,0 +1,40 @@
+#gameboard {
+    width: 688px;
+    height: 688px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.square {
+    width: 86px;
+    height: 86px;
+    position: relative;
+}
+
+.square img {
+    width: 81px;
+    height: 81px;
+    margin: 5px;
+    position: relative;
+    z-index: -9;
+}
+
+.piece {
+    position: relative;
+    z-index: 9;
+}
+
+.blue {
+    background-color: #3e4580;
+}
+
+.pink {
+    background-color: #f1c8e2;
+}
+
+/* .piece img {
+    width: 85px;
+    height: 85px;
+    position: relative;
+    z-index: 10;
+} */
