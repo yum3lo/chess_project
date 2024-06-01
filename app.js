@@ -40,7 +40,9 @@ function createBoard() {
 createBoard()
 
 const allSquares = document.querySelectorAll(".square")
-let startPosition, draggedElement, endPosition
+// reverse ids as the white pieces are at the bottom of the board
+reverseIds()
+let startPositionId, draggedElement, endPosition
 
 allSquares.forEach(square => {
     square.addEventListener('dragover', dragOver);
@@ -50,7 +52,8 @@ allSquares.forEach(square => {
 function dragStart(e) {
     //div.piece - parent of img, parent of div.piece - square
     draggedElement = e.target.parentNode
-    startPosition = draggedElement.parentNode.getAttribute('square-id')
+    //console.log(draggedElement)
+    startPositionId = draggedElement.parentNode.getAttribute('square-id')
     // save the HTML of the dragged piece
     e.dataTransfer.setData('text/html', draggedElement.outerHTML)
 }
@@ -59,41 +62,205 @@ function dragOver(e) {
     e.preventDefault()
 }
 
-function dropPiece(e) {
-    e.preventDefault();
-    const targetSquare = e.target.closest('.square');
-    endPosition = targetSquare.getAttribute('square-id');
-    
-    if (startPosition !== endPosition) {
-        targetSquare.innerHTML = e.dataTransfer.getData('text/html');
-        const newPiece = targetSquare.querySelector('.piece img');
-        if (newPiece) {
-            newPiece.setAttribute('draggable', true);
-            newPiece.addEventListener('dragstart', dragStart);
+function dropPiece(e) {    
+    const correctGo = draggedElement.firstChild.classList.contains(playerGo) //img contains class white or black
+    const taken = e.target.parentNode.classList.contains('piece') //div contains class piece
+    const valid = checkIfValid(e.target)
+    const opponentGo = playerGo === "white" ? "black" : "white"
+    const takenByOpponent = e.target.classList.contains(opponentGo) //true if taken by opponent, false - if not
+
+    if (correctGo) {
+        if (takenByOpponent && valid) {
+            //square appends div of dragged element
+            e.target.parentNode.parentNode.append(draggedElement) 
+            //remove the div of the taken piece
+            e.target.parentNode.remove() 
+            changePlayer()
+            return    
+        } 
+        if (taken && !takenByOpponent) {
+            infoDisplay.textContent = "Invalid move"
+            setTimeout(() => infoDisplay.textContent = '', 2000)
+            return
         }
-
-        // clear the original square
-        const originalSquare = document.querySelector(`.square[square-id='${startPosition}']`);
-        originalSquare.innerHTML = '';
+        if (valid) {
+            e.target.append(draggedElement)
+            changePlayer()
+            return
+        }
     }
-    
-    // reset variables
-    draggedElement = null;
-    startPosition = null;
-    endPosition = null;
-
-    const taken = e.target.classList.contains('piece')
-    chnagePlayer()
 }
 
-function chnagePlayer() {
+function checkIfValid(target) {
+    const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.parentNode.getAttribute('square-id'))
+    const startId = Number(startPositionId)
+    const piece = draggedElement.id
+    console.log(targetId, startId, piece)
+    switch (piece) {
+        case "pawn":
+            const startRow = [8,9,10,11,12,13,14,15]
+            if (
+                startRow.includes(startId) && startId + width * 2 === targetId ||
+                startId + width === targetId ||
+                startId + width - 1 === targetId && 
+                // if there is a piece on the diagonal square
+                document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild ||
+                startId + width + 1 === targetId && 
+                document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild
+            ){
+                return true
+            }
+            break
+        case "knight":
+            if (
+                startId + width * 2 - 1 === targetId ||
+                startId + width * 2 + 1 === targetId ||
+                startId - width * 2 - 1 === targetId ||
+                startId - width * 2 + 1 === targetId ||
+                startId + width - 2 === targetId ||
+                startId + width + 2 === targetId ||
+                startId - width - 2 === targetId ||
+                startId - width + 2 === targetId
+            ){
+                return true
+            }
+            break
+        case "bishop":
+            if (
+                // up left ++
+                startId + width + 1 === targetId ||
+                startId + width * 2 + 2 === targetId 
+                    // and if there is nothing on the diagonal square it jumps over
+                    && !document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild ||
+                startId + width * 3 + 3 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 + 2}"]`).firstChild ||
+                startId + width * 4 + 4 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 + 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 3 + 3}"]`).firstChild ||
+                startId + width * 5 + 5 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 + 2}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId + width * 3 + 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 4 + 4}"]`).firstChild ||
+                startId + width * 6 + 6 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 + 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 3 + 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 4 + 4}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId + width * 5 + 5}"]`).firstChild ||
+                startId + width * 7 + 7 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 + 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 3 + 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 4 + 4}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId + width * 5 + 5}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId + width * 6 + 6}"]`).firstChild || 
+                // up right +-
+                startId + width - 1 === targetId ||
+                startId + width * 2 - 2 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild ||
+                startId + width * 3 - 3 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 - 2}"]`).firstChild ||
+                startId + width * 4 - 4 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 - 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 3 - 3}"]`).firstChild ||
+                startId + width * 5 - 5 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 - 2}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId + width * 3 - 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 4 - 4}"]`).firstChild ||
+                startId + width * 6 - 6 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 - 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 3 - 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 4 - 4}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId + width * 5 - 5}"]`).firstChild ||
+                startId + width * 7 - 7 === targetId 
+                    && !document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 2 - 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 3 - 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId + width * 4 - 4}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId + width * 5 - 5}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId + width * 6 - 6}"]`).firstChild ||
+                // down left -+
+                startId - width + 1 === targetId ||
+                startId - width * 2 + 2 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width + 1}"]`).firstChild ||
+                startId - width * 3 + 3 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 + 2}"]`).firstChild ||
+                startId - width * 4 + 4 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 + 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 3 + 3}"]`).firstChild ||
+                startId - width * 5 + 5 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 + 2}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId - width * 3 + 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 4 + 4}"]`).firstChild ||
+                startId - width * 6 + 6 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 + 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 3 + 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 4 + 4}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId - width * 5 + 5}"]`).firstChild ||
+                startId - width * 7 + 7 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width + 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 + 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 3 + 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 4 + 4}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId - width * 5 + 5}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId - width * 6 + 6}"]`).firstChild || 
+                // down right --
+                startId - width - 1 === targetId ||
+                startId - width * 2 - 2 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width - 1}"]`).firstChild ||
+                startId - width * 3 - 3 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 - 2}"]`).firstChild ||
+                startId - width * 4 - 4 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 - 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 3 - 3}"]`).firstChild ||
+                startId - width * 5 - 5 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 - 2}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId - width * 3 - 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 4 - 4}"]`).firstChild ||
+                startId - width * 6 - 6 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 - 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 3 - 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 4 - 4}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId - width * 5 - 5}"]`).firstChild ||
+                startId - width * 7 - 7 === targetId 
+                    && !document.querySelector(`[square-id="${startId - width - 1}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 2 - 2}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 3 - 3}"]`).firstChild 
+                    && !document.querySelector(`[square-id="${startId - width * 4 - 4}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId - width * 5 - 5}"]`).firstChild
+                    && !document.querySelector(`[square-id="${startId - width * 6 - 6}"]`).firstChild
+                ) {
+                return true
+            }
+            break
+        case "rook":
+
+    }
+}
+
+function changePlayer() {
+    reverseIds() // reverse the ids to match the playerGo
     if (playerGo === "white") {
-        // reverse ids of squares, like turning the gameboard upside down
-        reverseIds()
+        revertIds()
         playerGo = "black"
         playerDisplay.textContent = 'black'
     } else {
-        revertIds()
+        reverseIds()
         playerGo = "white"
         playerDisplay.textContent = 'white'
     }
