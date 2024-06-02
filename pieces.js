@@ -1,4 +1,4 @@
-const king_b = '<div class="piece" id="king"><img src="images/king_B.png" alt="B King class="black"/></div>';
+const king_b = '<div class="piece" id="king"><img src="images/king_B.png" alt="B King" class="black"/></div>';
 const queen_b = '<div class="piece" id="queen"><img src="images/queen_B.png" alt="B Queen" class="black"/></div>';
 const rook_b = '<div class="piece" id="rook"><img src="images/rook_B.png" alt="B Rook" class="black"/></div>';
 const bishop_b = '<div class="piece" id="bishop"><img src="images/bishop_B.png" alt="B Bishop" class="black"/></div>';
