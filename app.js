@@ -79,7 +79,7 @@ function dropPiece(e) {
             changePlayer()
             return
         } 
-        if (taken && !takenByOpponent) {
+        if (taken && !takenByOpponent || !valid) {
             infoDisplay.textContent = "Invalid move"
             setTimeout(() => infoDisplay.textContent = '', 2000)
             return
