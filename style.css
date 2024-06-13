@@ -7,7 +7,6 @@ body, html {
 /* container to center the gameboard */
 .grid-container {
     display: grid;
-    place-items: center;
     height: 100%;
 }
 
@@ -16,6 +15,8 @@ body, html {
     height: 688px;
     display: flex;
     flex-wrap: wrap;
+    border: 3px solid #070c40;
+    border-radius: 5px;
 }
 
 .square {
@@ -47,4 +48,48 @@ body, html {
 
 .pink {
     background-color: #f1c8e2;
+}
+
+.card p {
+    font-family: 'LXGW WenKai TC', serif;
+    font-size: 40px;
+    font-weight: bold;
+    color: #04051f;
+    text-align: center;
+}
+
+#player {
+    font-weight: bold;
+    color: #870b5c;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.card {
+    margin-left: 30px;
+    padding: 10px;
+    background-color: #c6caf0;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 3px solid #070c40;
+    width: 350px;
+    height: 140px;
+}
+
+.invalid-move {
+    color: #870b5c;
+    font-family: 'LXGW WenKai TC', serif;
+    font-weight: bold;
+    font-size: 40px;
+    text-align: center;
+    background-color: #de8ab5;
+    padding: 10px;
+    border-radius: 5px;
+    border: 3px solid #870b5c;
+    margin-top: 80px;
 }

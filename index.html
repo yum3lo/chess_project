@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html lang="eng">
 <head>
-    <meta charset="UTF-8">
-    <title>Chess</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Chess</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="images/logo.png" sizes="32x32" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="container">
     <div class="grid-container">
-        <div id="gameboard"></div>
+      <div id="gameboard"></div>
     </div>    
-    <p> It is <span id="player"></span>'s turn. </p>
-    <p id="info-display"></p>
-    <script src="pieces.js"></script>
-    <script src="app.js"></script>
+    <div class="card">
+      <p> It is <span id="player"></span>'s turn. </p>
+      <p id="info-display"></p>
+    </div>
+  </div>
+  <script src="pieces.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

@@ -81,7 +81,11 @@ function dropPiece(e) {
         } 
         if (taken && !takenByOpponent || !valid) {
             infoDisplay.textContent = "Invalid move"
-            setTimeout(() => infoDisplay.textContent = '', 2000)
+            infoDisplay.classList.add('invalid-move')
+            setTimeout(() => {
+                infoDisplay.textContent = ''
+                infoDisplay.classList.remove('invalid-move')
+            }, 3000)
             return
         }
         if (valid) {
