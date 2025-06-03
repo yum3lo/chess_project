@@ -5,6 +5,9 @@ const width = 8
 let playerGo = "white"
 playerDisplay.textContent = playerGo
 
+let whiteScore = 0
+let blackScore = 0
+
 const startPieces = [
     rook_b, knight_b, bishop_b, queen_b, king_b, bishop_b, knight_b, rook_b,
     pawn_b, pawn_b, pawn_b, pawn_b, pawn_b, pawn_b, pawn_b, pawn_b,
@@ -15,6 +18,18 @@ const startPieces = [
     pawn_w, pawn_w, pawn_w, pawn_w, pawn_w, pawn_w, pawn_w, pawn_w,
     rook_w, knight_w, bishop_w, queen_w, king_w, bishop_w, knight_w, rook_w
 ]
+
+// score display and reset button
+const scoreContainer = document.createElement('div')
+scoreContainer.classList.add('score-container')
+scoreContainer.innerHTML = `<p class="score-text">Score: <span id="white-score">0</span> - <span id="black-score">0</span></p>`
+document.querySelector('.text-container').appendChild(scoreContainer)
+
+const resetButton = document.createElement('button')
+resetButton.textContent = 'Reset Board'
+resetButton.id = 'reset-button'
+resetButton.addEventListener('click', resetBoard)
+document.querySelector('.text-container').appendChild(resetButton)
 
 function createBoard() {
     startPieces.forEach((startPiece, i) => {
@@ -220,7 +235,7 @@ function checkIfValid(target) {
                     && !document.querySelector(`[square-id="${startId - width * 3 + 3}"]`).firstChild 
                     && !document.querySelector(`[square-id="${startId - width * 4 + 4}"]`).firstChild
                     && !document.querySelector(`[square-id="${startId - width * 5 + 5}"]`).firstChild
-                    && !document.querySelector(`[square-id="${startId - width * 6 + 6}"]`).firstChild || 
+                    && !document.querySelector(`[square-id="${startId - width * 6 + 6}"]`).firstChild ||
                 // down right --
                 startId - width - 1 === targetId ||
                 startId - width * 2 - 2 === targetId 
@@ -249,13 +264,8 @@ function checkIfValid(target) {
                     && !document.querySelector(`[square-id="${startId - width * 3 - 3}"]`).firstChild 
                     && !document.querySelector(`[square-id="${startId - width * 4 - 4}"]`).firstChild
                     && !document.querySelector(`[square-id="${startId - width * 5 - 5}"]`).firstChild
-                    && !document.querySelector(`[square-id="${startId - width * 6 - 6}"]`).firstChild
-                ) {
-                return true
-            }
-            break
-        case "rook":
-            if (
+                    && !document.querySelector(`[square-id="${startId - width * 6 - 6}"]`).firstChild ||
+                // rook moves
                 // up
                 startId + width === targetId ||
                 startId + width * 2 === targetId 
@@ -466,7 +476,7 @@ function checkIfValid(target) {
                     && !document.querySelector(`[square-id="${startId - width * 3 + 3}"]`).firstChild 
                     && !document.querySelector(`[square-id="${startId - width * 4 + 4}"]`).firstChild
                     && !document.querySelector(`[square-id="${startId - width * 5 + 5}"]`).firstChild
-                    && !document.querySelector(`[square-id="${startId - width * 6 + 6}"]`).firstChild || 
+                    && !document.querySelector(`[square-id="${startId - width * 6 + 6}"]`).firstChild ||
                 // down right --
                 startId - width - 1 === targetId ||
                 startId - width * 2 - 2 === targetId 
@@ -664,6 +674,41 @@ function checkWin() {
     console.log(both_kings)
     if (both_kings.length === 1) {
         let winner = both_kings[0].firstChild.className
-        infoDisplay.textContent = `${winner} wins`
+        if (winner === "white") {
+            whiteScore++
+            document.getElementById('white-score').textContent = whiteScore
+        } else {
+            blackScore++
+            document.getElementById('black-score').textContent = blackScore
+        }
+        infoDisplay.textContent = `${winner} wins!`
+        infoDisplay.classList.add('winner-message')
+        // disable further gameplay when someone wins
+        allSquares.forEach(square => {
+            const piece = square.querySelector('.piece img')
+            if (piece) {
+                piece.removeEventListener('dragstart', dragStart)
+            }
+        })
     }
+}
+
+function resetBoard() {
+    gameBoard.innerHTML = ''
+    
+    playerGo = "white"
+    playerDisplay.textContent = playerGo
+    
+    infoDisplay.textContent = ''
+    infoDisplay.classList.remove('winner-message', 'invalid-move')
+    
+    createBoard()
+    
+    const allSquaresNew = document.querySelectorAll(".square")
+    reverseIds()
+    
+    allSquaresNew.forEach(square => {
+        square.addEventListener('dragover', dragOver)
+        square.addEventListener('drop', dropPiece)
+    })
 }
